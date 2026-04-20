@@ -2,211 +2,164 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Karatê Profissional</title>
+    <title>Painel Karatê - Gestão de Koto</title>
     <style>
-        :root { --aka-color: #d32f2f; --ao-color: #1976d2; --gold: #ffd700; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #000; color: white; margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+        :root { --aka: #d32f2f; --ao: #1976d2; --gold: #ffd700; --bg-dark: #1a1a1a; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #000; color: #fff; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        .header { background: #1a1a1a; padding: 10px; text-align: center; border-bottom: 4px solid var(--gold); }
-        .timer-sec { display: inline-block; background: #333; padding: 10px 40px; border-radius: 50px; border: 3px solid var(--gold); }
-        .clock-display { font-size: 4.5em; font-weight: bold; font-family: monospace; color: var(--gold); line-height: 1; min-width: 250px; }
+        .header { background: var(--bg-dark); padding: 10px; border-bottom: 4px solid var(--gold); text-align: center; }
+        #clock { font-size: 5.5em; font-family: 'Courier New', Courier, monospace; color: var(--gold); font-weight: bold; line-height: 1; margin-bottom: 10px; }
         
-        .timer-controls button { background: var(--gold); border: none; padding: 10px 20px; margin: 5px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 1em; }
-        .btn-encho { background: #ff9800 !important; color: white !important; display: none; }
+        .timer-ctrl button { padding: 10px 25px; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; margin: 0 5px; font-size: 1.1em; }
+        .btn-start { background: #4caf50; color: white; }
+        .btn-pause { background: #f44336; color: white; }
+        .btn-encho { background: #ff9800; color: white; }
 
-        .arena { display: flex; flex: 1; padding: 15px; gap: 15px; }
-        .atleta-box { flex: 1; border-radius: 25px; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-        .aka { background: linear-gradient(180deg, #b71c1c 0%, #7f0000 100%); border: 6px solid #5f0000; }
-        .ao { background: linear-gradient(180deg, #0d47a1 0%, #002171 100%); border: 6px solid #00164b; }
+        .arena { display: flex; flex: 1; gap: 10px; padding: 10px; }
+        .box { flex: 1; border-radius: 20px; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; text-align: center; }
+        .aka { background: linear-gradient(180deg, #b71c1c, #7f0000); border: 4px solid #5f0000; }
+        .ao { background: linear-gradient(180deg, #0d47a1, #002171); border: 4px solid #00164b; }
 
-        .nome { font-size: 2.2em; font-weight: 900; text-transform: uppercase; height: 60px; text-shadow: 2px 2px 4px #000; }
-        .pontos { font-size: 9em; font-weight: bold; margin: 0; line-height: 1; }
+        .nome { font-size: 2.5em; font-weight: 900; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .placar { font-size: 10em; font-weight: bold; line-height: 1; margin: 0; }
+        
+        .btn-pts { padding: 15px; font-size: 1.2em; font-weight: bold; cursor: pointer; border-radius: 10px; border: none; background: #fff; color: #000; margin: 2px; }
+        
+        .faltas-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 15px; }
+        .btn-falta { background: #333; color: #aaa; border: 1px solid #555; padding: 8px 2px; font-size: 0.7em; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-falta.active { background: var(--gold) !important; color: #000 !important; box-shadow: 0 0 10px var(--gold); }
+        .shikaku-btn { background: #000 !important; color: #f00 !important; }
 
-        .btn-ponto { flex: 1; padding: 15px; font-size: 1.1em; font-weight: bold; background: #fff; color: #000; border: none; border-radius: 10px; margin: 2px; cursor: pointer; }
-        .faltas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; }
-        .btn-falta { padding: 8px; font-size: 0.75em; color: white; background: #444; border: 1px solid #666; border-radius: 5px; cursor: pointer; }
-        .btn-falta.on { background: var(--gold) !important; color: #000 !important; font-weight: bold; }
-
-        .btn-win-hantei { width: 100%; background: var(--gold); color: #000; padding: 12px; font-size: 1.3em; font-weight: bold; margin-top: 10px; display: none; border-radius: 10px; cursor: pointer; }
-
-        #overlay-campeao { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 999; flex-direction: column; justify-content: center; align-items: center; }
-        .card-campeao { padding: 50px; border-radius: 40px; text-align: center; border: 10px solid var(--gold); box-shadow: 0 0 50px var(--gold); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; }
+        .venc-card { padding: 60px; border: 10px solid var(--gold); border-radius: 40px; text-align: center; }
+        .dq-label { background: #f44336; color: white; padding: 5px 15px; border-radius: 5px; font-size: 0.4em; display: block; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div id="overlay-campeao">
-    <div class="card-campeao" id="card-cor">
-        <h1 style="font-size: 3em; margin: 0; color: white;">🏆 VENCEDOR 🏆</h1>
-        <div id="vencedor-nome" style="font-size: 4.5em; font-weight: 900; margin: 20px 0; color: white;">NOME</div>
-        <button onclick="fecharCampeao()" style="padding: 15px 50px; font-size: 1.5em; cursor: pointer; border-radius: 10px; border: none;">CONTINUAR</button>
+<div id="venc-overlay" class="overlay">
+    <div id="venc-box" class="venc-card">
+        <div id="dq-msg" class="dq-label" style="display:none;">DESCLASSIFICAÇÃO (HANSOKU/SHIKAKU)</div>
+        <h1 style="font-size: 3em; margin: 0;">🏆 VENCEDOR 🏆</h1>
+        <div id="venc-nome" style="font-size: 5em; font-weight: 900; margin: 30px 0;">NOME</div>
+        <button onclick="location.reload()" style="padding: 20px 60px; font-size: 1.2em; cursor:pointer; border-radius: 10px; border:none; font-weight:bold;">PRÓXIMA LUTA</button>
     </div>
 </div>
 
 <div class="header">
-    <div class="timer-sec">
-        <div class="clock-display" id="clock">01:30</div>
-        <div class="timer-controls">
-            <button onclick="controlTimer('start')" id="btn-start">INICIAR</button>
-            <button onclick="controlTimer('stop')" style="background:#f44336; color:white;">PARAR</button>
-            <button onclick="resetLutaCompleta()" style="background:#fff;">NOVA LUTA (LIMPAR TUDO)</button>
-            <button class="btn-encho" id="btn-encho" onclick="iniciarEnchoSen()">PRORROGAÇÃO (01:00)</button>
-        </div>
+    <div id="clock">01:30</div>
+    <div class="timer-ctrl">
+        <button class="btn-start" onclick="start()">INICIAR</button>
+        <button class="btn-pause" onclick="pause()">PAUSAR</button>
+        <button class="btn-encho" onclick="resetTimer(60)">ENCHO-SEN (1:00)</button>
     </div>
 </div>
 
 <div class="arena">
-    <div class="atleta-box aka">
-        <div class="nome" id="nome-aka">AKA</div>
-        <div class="pontos" id="ponto-aka">0</div>
-        <div style="display:flex;">
-            <button class="btn-ponto" onclick="addPonto('aka', 1)">YUKO</button>
-            <button class="btn-ponto" onclick="addPonto('aka', 2)">WAZA</button>
-            <button class="btn-ponto" onclick="addPonto('aka', 3)">IPPON</button>
+    <div class="box aka">
+        <div class="nome" id="n-aka">AKA</div>
+        <div class="placar" id="p-aka">0</div>
+        <div style="display:flex">
+            <button class="btn-pts" onclick="add('aka',1)">YUKO</button>
+            <button class="btn-pts" onclick="add('aka',2)">WAZA</button>
+            <button class="btn-pts" onclick="add('aka',3)">IPPON</button>
         </div>
-        <button class="btn-win-hantei" id="hantei-aka" onclick="saltarCampeao('aka')">VENCEDOR HANTEI</button>
-        <div class="faltas-grid">
-            <button id="aka-K" class="btn-falta" onclick="toggle('aka-K')">KEIKOKU</button>
-            <button id="aka-HS" class="btn-falta" onclick="toggle('aka-HS')">H-SUI</button>
-            <button id="aka-H" class="btn-falta" onclick="toggle('aka-H')">HANSOKU</button>
-            <button id="aka-M" class="btn-falta" onclick="toggle('aka-M')">MUBOBI</button>
-            <button id="aka-HSAN" class="btn-falta" onclick="toggle('aka-HSAN')">HSANSOKU</button>
-            <button id="aka-S" class="btn-falta" style="background:#000;color:red" onclick="toggle('aka-S')">SHIKAKU</button>
+        <div class="faltas-container">
+            <button class="btn-falta" onclick="toggleF(this)">KEIKOKU</button>
+            <button class="btn-falta" onclick="toggleF(this)">H-SUI</button>
+            <button class="btn-falta" onclick="desclassificar('aka','HANSOKU')">HANSOKU</button>
+            <button class="btn-falta" onclick="toggleF(this)">MUBOBI</button>
+            <button class="btn-falta" onclick="toggleF(this)">HSANSOKU</button>
+            <button class="btn-falta shikaku-btn" onclick="desclassificar('aka','SHIKAKU')">SHIKAKU</button>
         </div>
+        <button id="win-aka-hantei" class="btn-start" style="display:none; margin-top:10px" onclick="win('aka')">VENCEDOR HANTEI</button>
     </div>
 
-    <div class="atleta-box ao">
-        <div class="nome" id="nome-ao">AO</div>
-        <div class="pontos" id="ponto-ao">0</div>
-        <div style="display:flex;">
-            <button class="btn-ponto" onclick="addPonto('ao', 1)">YUKO</button>
-            <button class="btn-ponto" onclick="addPonto('ao', 2)">WAZA</button>
-            <button class="btn-ponto" onclick="addPonto('ao', 3)">IPPON</button>
+    <div class="box ao">
+        <div class="nome" id="n-ao">AO</div>
+        <div class="placar" id="p-ao">0</div>
+        <div style="display:flex">
+            <button class="btn-pts" onclick="add('ao',1)">YUKO</button>
+            <button class="btn-pts" onclick="add('ao',2)">WAZA</button>
+            <button class="btn-pts" onclick="add('ao',3)">IPPON</button>
         </div>
-        <button class="btn-win-hantei" id="hantei-ao" onclick="saltarCampeao('ao')">VENCEDOR HANTEI</button>
-        <div class="faltas-grid">
-            <button id="ao-K" class="btn-falta" onclick="toggle('ao-K')">KEIKOKU</button>
-            <button id="ao-HS" class="btn-falta" onclick="toggle('ao-HS')">H-SUI</button>
-            <button id="ao-H" class="btn-falta" onclick="toggle('ao-H')">HANSOKU</button>
-            <button id="ao-M" class="btn-falta" onclick="toggle('ao-M')">MUBOBI</button>
-            <button id="ao-HSAN" class="btn-falta" onclick="toggle('ao-HSAN')">HSANSOKU</button>
-            <button id="ao-S" class="btn-falta" style="background:#000;color:red" onclick="toggle('ao-S')">SHIKAKU</button>
+        <div class="faltas-container">
+            <button class="btn-falta" onclick="toggleF(this)">KEIKOKU</button>
+            <button class="btn-falta" onclick="toggleF(this)">H-SUI</button>
+            <button class="btn-falta" onclick="desclassificar('ao','HANSOKU')">HANSOKU</button>
+            <button class="btn-falta" onclick="toggleF(this)">MUBOBI</button>
+            <button class="btn-falta" onclick="toggleF(this)">HSANSOKU</button>
+            <button class="btn-falta shikaku-btn" onclick="desclassificar('ao','SHIKAKU')">SHIKAKU</button>
         </div>
+        <button id="win-ao-hantei" class="btn-start" style="display:none; margin-top:10px" onclick="win('ao')">VENCEDOR HANTEI</button>
     </div>
 </div>
 
 <script>
-    let tempoRestante = 90;
-    let timerId = null;
-
-    function atualizarDisplay() {
-        const min = Math.floor(tempoRestante / 60);
-        const seg = tempoRestante % 60;
-        document.getElementById('clock').innerText = 
-            `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
-    }
-
-    function controlTimer(action) {
-        if (action === 'start') {
-            if (timerId !== null) return; 
-            timerId = setInterval(() => {
-                if (tempoRestante > 0) {
-                    tempoRestante--;
-                    atualizarDisplay();
-                } else {
-                    controlTimer('stop');
-                    processarFimDeTempo();
-                }
-            }, 1000);
-        } else {
-            clearInterval(timerId);
-            timerId = null;
-        }
-    }
-
-    function processarFimDeTempo() {
-        const pAka = parseInt(document.getElementById('ponto-aka').innerText);
-        const pAo = parseInt(document.getElementById('ponto-ao').innerText);
-
-        if (pAka > pAo) {
-            saltarCampeao('aka');
-        } else if (pAo > pAka) {
-            saltarCampeao('ao');
-        } else {
-            document.getElementById('btn-encho').style.display = 'inline-block';
-            document.getElementById('hantei-aka').style.display = 'block';
-            document.getElementById('hantei-ao').style.display = 'block';
-        }
-    }
-
-    function iniciarEnchoSen() {
-        controlTimer('stop');
-        tempoRestante = 60;
-        atualizarDisplay();
-        document.getElementById('btn-encho').style.display = 'none';
-        document.getElementById('hantei-aka').style.display = 'none';
-        document.getElementById('hantei-ao').style.display = 'none';
-        controlTimer('start');
-    }
-
-    function resetLutaCompleta() {
-        controlTimer('stop');
-        tempoRestante = 90;
-        atualizarDisplay();
-        
-        // Limpa Pontos
-        document.getElementById('ponto-aka').innerText = "0";
-        document.getElementById('ponto-ao').innerText = "0";
-        
-        // Limpa Faltas
-        document.querySelectorAll('.btn-falta').forEach(b => b.classList.remove('on'));
-        
-        // Esconde botões extras
-        document.getElementById('btn-encho').style.display = 'none';
-        document.getElementById('hantei-aka').style.display = 'none';
-        document.getElementById('hantei-ao').style.display = 'none';
-        
-        // Se houver novos nomes na URL, eles serão mantidos, 
-        // mas o painel fica pronto para a próxima dupla da planilha.
-    }
-
-    function saltarCampeao(cor) {
-        const nomeAtleta = document.getElementById('nome-' + cor).innerText;
-        document.getElementById('vencedor-nome').innerText = nomeAtleta;
-        document.getElementById('card-cor').style.background = (cor === 'aka') ? 'var(--aka-color)' : 'var(--ao-color)';
-        document.getElementById('overlay-campeao').style.display = 'flex';
-    }
-
-    function fecharCampeao() {
-        document.getElementById('overlay-campeao').style.display = 'none';
-    }
-
-    function addPonto(a, v) {
-        const el = document.getElementById('ponto-' + a);
-        el.innerText = parseInt(el.innerText) + v;
-    }
-
-    function toggle(id) {
-        document.getElementById(id).classList.toggle('on');
-    }
-
-    window.onload = function() {
+    let time = 90;
+    let timer = null;
     const params = new URLSearchParams(window.location.search);
-    const categoria = params.get('cat') || "";
-    
-    document.getElementById('nome-aka').innerText = params.get('aka') || "AKA";
-    document.getElementById('nome-ao').innerText = params.get('ao') || "AO";
 
-    // MODO KATA: Esconde timer e pontos, mostra botões de Hantei direto
-    if (categoria.includes("KATA")) {
-        document.querySelector('.timer-sec').style.opacity = "0.5"; // Kata não tem tempo fixo de luta geralmente
-        document.querySelectorAll('.pontos-grid').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.pontos').forEach(el => el.style.fontSize = '3em'); 
-        document.querySelectorAll('.btn-win-hantei').forEach(el => el.style.display = 'block');
-        alert("MODO KATA ATIVADO: Avaliação por bandeirada (Hantei)");
+    window.onload = () => {
+        document.getElementById('n-aka').innerText = params.get('aka') || 'AKA';
+        document.getElementById('n-ao').innerText = params.get('ao') || 'AO';
+        updateDisplay();
     }
-}
-    };
+
+    function updateDisplay() {
+        let m = Math.floor(time / 60);
+        let s = time % 60;
+        document.getElementById('clock').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function start() {
+        if (timer) return;
+        timer = setInterval(() => {
+            if (time > 0) { time--; updateDisplay(); } 
+            else { pause(); finalizarLuta(); }
+        }, 1000);
+    }
+
+    function pause() { clearInterval(timer); timer = null; }
+
+    function resetTimer(sec) {
+        pause(); time = sec; updateDisplay();
+        document.getElementById('win-aka-hantei').style.display = 'none';
+        document.getElementById('win-ao-hantei').style.display = 'none';
+    }
+
+    function finalizarLuta() {
+        let pAka = parseInt(document.getElementById('p-aka').innerText);
+        let pAo = parseInt(document.getElementById('p-ao').innerText);
+        if (pAka !== pAo) {
+            win(pAka > pAo ? 'aka' : 'ao');
+        } else {
+            document.getElementById('win-aka-hantei').style.display = 'block';
+            document.getElementById('win-ao-hantei').style.display = 'block';
+        }
+    }
+
+    function desclassificar(atletaInfrator, tipo) {
+        pause();
+        const vencedor = (atletaInfrator === 'aka') ? 'ao' : 'aka';
+        document.getElementById('dq-msg').style.display = 'block';
+        document.getElementById('dq-msg').innerText = `DESCLASSIFICAÇÃO POR ${tipo}`;
+        win(vencedor);
+    }
+
+    function add(atleta, pts) {
+        let el = document.getElementById('p-' + atleta);
+        el.innerText = parseInt(el.innerText) + pts;
+    }
+
+    function toggleF(btn) { btn.classList.toggle('active'); }
+
+    function win(cor) {
+        let nome = document.getElementById('n-' + cor).innerText;
+        document.getElementById('venc-nome').innerText = nome;
+        document.getElementById('venc-box').style.background = cor === 'aka' ? 'var(--aka)' : 'var(--ao)';
+        document.getElementById('venc-overlay').style.display = 'flex';
+    }
 </script>
 </body>
 </html>
