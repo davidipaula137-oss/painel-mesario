@@ -2,85 +2,100 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel do Mesário - Karatê</title>
+    <title>Painel do Mesário - Gestão de Faltas</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; margin: 0; }
-        .header { width: 100%; background: #333; padding: 10px; text-align: center; border-bottom: 4px solid #ffd700; }
-        .arena { display: flex; width: 95%; justify-content: space-around; margin-top: 20px; }
+        body { font-family: 'Arial', sans-serif; background-color: #121212; color: white; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .header { width: 100%; background: #222; padding: 15px; text-align: center; border-bottom: 5px solid #ffd700; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .arena { display: flex; width: 98%; justify-content: space-around; margin-top: 20px; gap: 15px; }
         
-        /* Cores Oficiais */
-        .atleta-box { width: 45%; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .aka { background: linear-gradient(145deg, #ff4b2b, #ff416c); border: 5px solid #990000; }
-        .ao { background: linear-gradient(145deg, #2193b0, #6dd5ed); border: 5px solid #0b5394; }
+        /* Containers Atletas */
+        .atleta-box { width: 48%; border-radius: 20px; padding: 25px; text-align: center; }
+        .aka { background: linear-gradient(145deg, #d32f2f, #b71c1c); border: 6px solid #7f0000; }
+        .ao { background: linear-gradient(145deg, #1976d2, #0d47a1); border: 6px solid #002171; }
         
-        .nome { font-size: 2.5em; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .pontos { font-size: 8em; font-weight: bold; margin: 20px 0; }
+        .nome { font-size: 2em; font-weight: bold; margin-bottom: 5px; height: 60px; overflow: hidden; }
+        .pontos { font-size: 7em; font-weight: bold; text-shadow: 3px 3px 6px rgba(0,0,0,0.4); margin: 10px 0; }
         
-        /* Controles */
-        .controles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 15px; font-size: 1.2em; cursor: pointer; border-radius: 8px; border: none; font-weight: bold; transition: 0.2s; }
-        button:active { transform: scale(0.95); }
-        .btn-ponto { background-color: #fff; color: #333; }
-        .btn-falta { background-color: #333; color: #fff; border: 1px solid #fff; }
+        /* Seção de Faltas */
+        .faltas-container { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .faltas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        
+        button { border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:active { transform: scale(0.92); }
+        
+        .btn-ponto { padding: 15px; font-size: 1.1em; background: #fff; color: #333; margin-bottom: 10px; width: 100%; }
+        
+        /* Botões de Punição */
+        .btn-falta { padding: 10px 5px; font-size: 0.75em; color: white; border: 1px solid rgba(255,255,255,0.3); }
+        .btn-falta.off { background: #444; }
+        .btn-falta.on { background: #ffd700; color: #000; box-shadow: 0 0 10px #ffd700; }
+        .btn-shikaku { background: #000; color: #ff0000; grid-column: span 3; margin-top: 5px; border: 1px solid red; }
 
-        .timer-container { margin: 20px; text-align: center; background: #444; padding: 20px; border-radius: 50%; width: 150px; height: 150px; display: flex; flex-direction: column; justify-content: center; border: 5px solid #ffd700; }
-        .timer { font-size: 3em; font-weight: bold; }
+        .timer-sec { margin: 10px; font-size: 3em; background: #333; padding: 10px 30px; border-radius: 50px; border: 3px solid #ffd700; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>GESTOR DE LUTA - CAMPEONATO GOIANO</h1>
-    <p>CATEGORIA: 18-35 ANOS | MARROM/PRETA</p>
-</div>
-
-<div class="timer-container">
-    <div class="timer" id="clock">01:30</div>
-    <button onclick="startTimer()" style="font-size: 0.8em; padding: 5px;">INICIAR</button>
+    <h1 id="categoria-label">GESTOR DE COMBATE</h1>
+    <div class="timer-sec" id="clock">03:00</div>
 </div>
 
 <div class="arena">
     <div class="atleta-box aka">
-        <div class="nome">AKA: ATLETA 1</div>
+        <div class="nome" id="nome-aka">AKA: CARREGANDO...</div>
         <div class="pontos" id="ponto-aka">0</div>
-        <div class="controles">
+        
+        <div style="display:flex; gap:5px;">
             <button class="btn-ponto" onclick="add('aka', 1)">+1 YUKO</button>
-            <button class="btn-ponto" onclick="add('aka', 2)">+2 WAZARI</button>
+            <button class="btn-ponto" onclick="add('aka', 2)">+2 WAZA</button>
             <button class="btn-ponto" onclick="add('aka', 3)">+3 IPPON</button>
-            <button class="btn-falta" onclick="alert('Punibilidade Aplicada')">FALTA</button>
+        </div>
+
+        <div class="faltas-container">
+            <div style="font-size: 0.9em; margin-bottom: 10px;">PUNIÇÕES / FALTAS</div>
+            <div class="faltas-grid">
+                <button id="aka-KEIKOKU" class="btn-falta off" onclick="toggleFalta('aka', 'KEIKOKU')">KEIKOKU</button>
+                <button id="aka-HANSOKU-SUI" class="btn-falta off" onclick="toggleFalta('aka', 'HANSOKU-SUI')">H-SUI</button>
+                <button id="aka-HANSOKU" class="btn-falta off" onclick="toggleFalta('aka', 'HANSOKU')">HANSOKU</button>
+                <button id="aka-MUBOBI" class="btn-falta off" onclick="toggleFalta('aka', 'MUBOBI')">MUBOBI</button>
+                <button id="aka-SHIKAKU" class="btn-falta btn-shikaku" onclick="if(confirm('EXPULSAR ATLETA?')) toggleFalta('aka', 'SHIKAKU')">SHIKAKU (DESCLASSIFICAÇÃO)</button>
+            </div>
         </div>
     </div>
 
     <div class="atleta-box ao">
-        <div class="nome">AO: ATLETA 2</div>
+        <div class="nome" id="nome-ao">AO: CARREGANDO...</div>
         <div class="pontos" id="ponto-ao">0</div>
-        <div class="controles">
+        
+        <div style="display:flex; gap:5px;">
             <button class="btn-ponto" onclick="add('ao', 1)">+1 YUKO</button>
-            <button class="btn-ponto" onclick="add('ao', 2)">+2 WAZARI</button>
+            <button class="btn-ponto" onclick="add('ao', 2)">+2 WAZA</button>
             <button class="btn-ponto" onclick="add('ao', 3)">+3 IPPON</button>
-            <button class="btn-falta" onclick="alert('Punibilidade Aplicada')">FALTA</button>
+        </div>
+
+        <div class="faltas-container">
+            <div style="font-size: 0.9em; margin-bottom: 10px;">PUNIÇÕES / FALTAS</div>
+            <div class="faltas-grid">
+                <button id="ao-KEIKOKU" class="btn-falta off" onclick="toggleFalta('ao', 'KEIKOKU')">KEIKOKU</button>
+                <button id="ao-HANSOKU-SUI" class="btn-falta off" onclick="toggleFalta('ao', 'HANSOKU-SUI')">H-SUI</button>
+                <button id="ao-HANSOKU" class="btn-falta off" onclick="toggleFalta('ao', 'HANSOKU')">HANSOKU</button>
+                <button id="ao-MUBOBI" class="btn-falta off" onclick="toggleFalta('ao', 'MUBOBI')">MUBOBI</button>
+                <button id="ao-SHIKAKU" class="btn-falta btn-shikaku" onclick="if(confirm('EXPULSAR ATLETA?')) toggleFalta('ao', 'SHIKAKU')">SHIKAKU (DESCLASSIFICAÇÃO)</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Função para pegar os nomes da URL
+    // Pega dados da URL (enviados pelo Google Sheets)
     window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const aka = urlParams.get('aka');
-        const ao = urlParams.get('ao');
-
-        if (aka) document.getElementById('nome-aka').innerText = "AKA: " + aka;
-        if (ao) document.getElementById('nome-ao').innerText = "AO: " + ao;
+        const params = new URLSearchParams(window.location.search);
+        if(params.get('aka')) document.getElementById('nome-aka').innerText = params.get('aka');
+        if(params.get('ao')) document.getElementById('nome-ao').innerText = params.get('ao');
     }
 
     function add(atleta, pts) {
         let el = document.getElementById('ponto-' + atleta);
-        el.innerText = parseInt(el.innerText) + pts;
-    }
-
-    // ... restante das funções do timer
-</script>
-
-</body>
-</html>
+        let novoPonto = parseInt(el.innerText) + pts;
+        el.innerText = novoPonto < 0 ? 0 : novoPonto
