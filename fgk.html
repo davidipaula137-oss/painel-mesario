@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Mesário - Karatê</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; margin: 0; }
+        .header { width: 100%; background: #333; padding: 10px; text-align: center; border-bottom: 4px solid #ffd700; }
+        .arena { display: flex; width: 95%; justify-content: space-around; margin-top: 20px; }
+        
+        /* Cores Oficiais */
+        .atleta-box { width: 45%; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .aka { background: linear-gradient(145deg, #ff4b2b, #ff416c); border: 5px solid #990000; }
+        .ao { background: linear-gradient(145deg, #2193b0, #6dd5ed); border: 5px solid #0b5394; }
+        
+        .nome { font-size: 2.5em; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .pontos { font-size: 8em; font-weight: bold; margin: 20px 0; }
+        
+        /* Controles */
+        .controles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 15px; font-size: 1.2em; cursor: pointer; border-radius: 8px; border: none; font-weight: bold; transition: 0.2s; }
+        button:active { transform: scale(0.95); }
+        .btn-ponto { background-color: #fff; color: #333; }
+        .btn-falta { background-color: #333; color: #fff; border: 1px solid #fff; }
+
+        .timer-container { margin: 20px; text-align: center; background: #444; padding: 20px; border-radius: 50%; width: 150px; height: 150px; display: flex; flex-direction: column; justify-content: center; border: 5px solid #ffd700; }
+        .timer { font-size: 3em; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>GESTOR DE LUTA - CAMPEONATO GOIANO</h1>
+    <p>CATEGORIA: 18-35 ANOS | MARROM/PRETA</p>
+</div>
+
+<div class="timer-container">
+    <div class="timer" id="clock">01:30</div>
+    <button onclick="startTimer()" style="font-size: 0.8em; padding: 5px;">INICIAR</button>
+</div>
+
+<div class="arena">
+    <div class="atleta-box aka">
+        <div class="nome">AKA: ATLETA 1</div>
+        <div class="pontos" id="ponto-aka">0</div>
+        <div class="controles">
+            <button class="btn-ponto" onclick="add('aka', 1)">+1 YUKO</button>
+            <button class="btn-ponto" onclick="add('aka', 2)">+2 WAZARI</button>
+            <button class="btn-ponto" onclick="add('aka', 3)">+3 IPPON</button>
+            <button class="btn-falta" onclick="alert('Punibilidade Aplicada')">FALTA</button>
+        </div>
+    </div>
+
+    <div class="atleta-box ao">
+        <div class="nome">AO: ATLETA 2</div>
+        <div class="pontos" id="ponto-ao">0</div>
+        <div class="controles">
+            <button class="btn-ponto" onclick="add('ao', 1)">+1 YUKO</button>
+            <button class="btn-ponto" onclick="add('ao', 2)">+2 WAZARI</button>
+            <button class="btn-ponto" onclick="add('ao', 3)">+3 IPPON</button>
+            <button class="btn-falta" onclick="alert('Punibilidade Aplicada')">FALTA</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Função para pegar os nomes da URL
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const aka = urlParams.get('aka');
+        const ao = urlParams.get('ao');
+
+        if (aka) document.getElementById('nome-aka').innerText = "AKA: " + aka;
+        if (ao) document.getElementById('nome-ao').innerText = "AO: " + ao;
+    }
+
+    function add(atleta, pts) {
+        let el = document.getElementById('ponto-' + atleta);
+        el.innerText = parseInt(el.innerText) + pts;
+    }
+
+    // ... restante das funções do timer
+</script>
+
+</body>
+</html>
