@@ -101,10 +101,16 @@
     const params = new URLSearchParams(window.location.search);
 
     window.onload = () => {
-        document.getElementById('n-aka').innerText = params.get('aka') || 'AKA';
-        document.getElementById('n-ao').innerText = params.get('ao') || 'AO';
-        updateDisplay();
-    }
+    // Captura os dados da URL
+    let akaFull = params.get('aka') || 'AKA';
+    let aoFull = params.get('ao') || 'AO';
+
+    // Exibe o nome completo (incluindo o que estiver nos parênteses vindo da planilha)
+    document.getElementById('n-aka').innerText = akaFull;
+    document.getElementById('n-ao').innerText = aoFull;
+    
+    updateDisplay();
+}
 
     function updateDisplay() {
         let m = Math.floor(time / 60);
