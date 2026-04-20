@@ -190,11 +190,22 @@
         document.getElementById(id).classList.toggle('on');
     }
 
-    window.onload = () => {
-        const p = new URLSearchParams(window.location.search);
-        if(p.get('aka')) document.getElementById('nome-aka').innerText = p.get('aka');
-        if(p.get('ao')) document.getElementById('nome-ao').innerText = p.get('ao');
-        atualizarDisplay();
+    window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    const categoria = params.get('cat') || "";
+    
+    document.getElementById('nome-aka').innerText = params.get('aka') || "AKA";
+    document.getElementById('nome-ao').innerText = params.get('ao') || "AO";
+
+    // MODO KATA: Esconde timer e pontos, mostra botões de Hantei direto
+    if (categoria.includes("KATA")) {
+        document.querySelector('.timer-sec').style.opacity = "0.5"; // Kata não tem tempo fixo de luta geralmente
+        document.querySelectorAll('.pontos-grid').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.pontos').forEach(el => el.style.fontSize = '3em'); 
+        document.querySelectorAll('.btn-win-hantei').forEach(el => el.style.display = 'block');
+        alert("MODO KATA ATIVADO: Avaliação por bandeirada (Hantei)");
+    }
+}
     };
 </script>
 </body>
